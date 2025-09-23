@@ -64,8 +64,8 @@ def main():
         # Light workload cities
         'ORD': 'Light',    # Chicago O'Hare - efficient operations
         'MDW': 'Light',    # Chicago Midway - smaller operations
-        'SEA': 'Heavy',    # Seattle - efficient turnarounds
-        'PDX': 'Heavy',    # Portland - smaller operations
+        'SEA': 'Medium',    # Seattle - efficient turnarounds
+        'PDX': 'Medium',    # Portland - smaller operations
         'MSY': 'Light',    # New Orleans - local operations
         'MEM': 'Light',    # Memphis - regional hub
         'STL': 'Light',    # St. Louis - regional operations

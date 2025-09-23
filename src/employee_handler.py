@@ -61,9 +61,9 @@ class EmployeeHandler:
             if 'max_flights_per_day' not in self.employees_df.columns:
                 if 'total_hours' in self.employees_df.columns:
                     # Estimate: 1 flight per 2-3 hours of work
-                    self.employees_df['max_flights_per_day'] = (self.employees_df['total_hours'] / 2.5).round().astype(int).clip(lower=1, upper=6)
+                    self.employees_df['max_flights_per_day'] = (self.employees_df['total_hours'] / 1.5).round().astype(int).clip(lower=1, upper=6)
                 else:
-                    self.employees_df['max_flights_per_day'] = 4  # Default
+                    self.employees_df['max_flights_per_day'] = 10  # Default
             
             # Initialize workload tracking
             self.workload_tracker = {emp_id: 0 for emp_id in self.employees_df['employee_id']}
