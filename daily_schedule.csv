@@ -1,36 +1,36 @@
-flight_id,inbound_city,outbound_city,aircraft,flight_route,eta,etd,gate,heaviness,turnaround_minutes,required_team_size,assigned_team_size,team_ids,team_names,assignment_success,failure_reason
-522,SEA,ORD,319,SEA → ORD,2025-09-13 15:52:00,2025-09-13 17:10:00,A2,Heavy,78.0,5,5.0,"['EMP024', 'EMP027', 'EMP028', 'EMP029', 'EMP030']","['Manghane, Kechell', 'Smith, Devin', 'Jakalski, Alec', 'Williams, Michael', 'Guye, Senna']",True,
-1708,EWR,SEA,37X,EWR → SEA,2025-09-13 20:58:00,2025-09-13 09:00:00,A7,Heavy,-718.0,5,5.0,"['EMP001', 'EMP003', 'EMP004', 'EMP005', 'EMP006']","['Garner, Cara', 'Ibrahim, Herman', 'Salman, Omed', 'Elley, Arson', 'Hernandez Chavez, Luis']",True,
-382,SEA,SEA,,SEA → SEA,2025-09-13 23:59:00,2025-09-13 09:00:00,A1,Heavy,-899.0,5,5.0,"['EMP008', 'EMP009', 'EMP007', 'EMP014', 'EMP013']","['Gostomski, Ross', 'Fuimaono, Sulufaleese', 'Sheikh, Mohamed', 'Lafquen, Jose', 'Harris, Nakia']",True,
-3728,IAH,IAD,73G,IAH → IAD,2025-09-13 06:10:00,2025-09-13 07:45:00,A1,Medium,95.0,4,4.0,"['EMP015', 'EMP012', 'EMP016', 'EMP017']","['Hussein, Mkufu', 'Wilkerson, Jaylan', 'Villanueva, Rodolfo', 'Alvarez, Evan']",True,
-7570,EWR,SFO,37S,EWR → SFO,2025-09-13 06:30:00,2025-09-13 06:45:00,A2,Medium,15.0,4,4.0,"['EMP002', 'EMP010', 'EMP011', 'EMP018']","['Zewude, Besufekad', 'Mustafa, Sirwan', 'Vale, Erick', 'Ibrahim, Hilal']",True,
-4883,SFO,EWR,320,SFO → EWR,2025-09-13 06:45:00,2025-09-13 09:45:00,A2,Medium,180.0,4,4.0,"['EMP020', 'EMP019', 'EMP001', 'EMP004']","['Rosario Valdes, Jennysha', 'White, Christian', 'Garner, Cara', 'Salman, Omed']",True,
-3730,IAD,DEN,73G,IAD → DEN,2025-09-13 07:45:00,2025-09-13 08:10:00,A3,Medium,25.0,4,4.0,"['EMP021', 'EMP003', 'EMP007', 'EMP005']","['Ahemed, Habib', 'Ibrahim, Herman', 'Sheikh, Mohamed', 'Elley, Arson']",True,
-4892,DEN,IAD,195,DEN → IAD,2025-09-13 08:10:00,2025-09-13 09:21:00,A4,Medium,71.0,4,4.0,"['EMP006', 'EMP010', 'EMP009', 'EMP008']","['Hernandez Chavez, Luis', 'Mustafa, Sirwan', 'Fuimaono, Sulufaleese', 'Gostomski, Ross']",True,
-N1557Y,IAH,DEN,E75,IAH → DEN,2025-09-13 08:34:00,2025-09-13 10:36:00,A4,Medium,122.0,4,4.0,"['EMP011', 'EMP012', 'EMP013', 'EMP014']","['Vale, Erick', 'Wilkerson, Jaylan', 'Harris, Nakia', 'Lafquen, Jose']",True,
-2336,IAD,DEN,195,IAD → DEN,2025-09-13 09:21:00,2025-09-13 10:26:00,A4,Medium,65.0,4,4.0,"['EMP023', 'EMP022', 'EMP015', 'EMP016']","['Martin, Joshua', 'Jakalski, Alec', 'Hussein, Mkufu', 'Villanueva, Rodolfo']",True,
-1633,DEN,DEN,73G,DEN → DEN,2025-09-13 13:18:00,2025-09-13 14:05:00,A4,Medium,47.0,4,4.0,"['EMP026', 'EMP033', 'EMP032', 'EMP035']","['Muhsman, Joshua', 'Willis, Andre', 'Holloway, Ronald', 'Hernandez Chavez, Luis']",True,
-1858,DEN,DEN,19F,DEN → DEN,2025-09-13 13:52:00,2025-09-13 17:30:00,A1,Medium,218.0,4,4.0,"['EMP031', 'EMP034', 'EMP028', 'EMP024']","['Vale, Erick', 'Ibrahim, Hilal', 'Jakalski, Alec', 'Manghane, Kechell']",True,
-6187,IAH,IAH,E7A,IAH → IAH,2025-09-13 14:09:00,2025-09-13 14:51:00,A4,Medium,42.0,4,4.0,"['EMP036', 'EMP027', 'EMP031', 'EMP029']","['Macaraig, Aiden', 'Smith, Devin', 'Vale, Erick', 'Williams, Michael']",True,
-222,IAH,IAH,73G,IAH → IAH,2025-09-13 16:36:00,2025-09-13 18:30:00,A8,Medium,114.0,4,4.0,"['EMP040', 'EMP041', 'EMP037', 'EMP039']","['Wubeshet, Leule', 'Sagoe, Secondous', 'Corkern, Timothy', 'Gostomski, Ross']",True,
-2349,IAD,IAD,20S,IAD → IAD,2025-09-13 18:38:00,2025-09-13 08:30:00,A4,Medium,-608.0,4,4.0,"['EMP025', 'EMP038', 'EMP045', 'EMP018']","['Ahemed, Habib', 'Garner, Cara', 'Arebo, Muaz', 'Ibrahim, Hilal']",True,
-4785,IAH,EWR,E70,IAH → EWR,2025-09-13 20:29:00,2025-09-13 06:00:00,A3,Medium,-869.0,4,4.0,"['EMP048', 'EMP017', 'EMP033', 'EMP032']","['Corkern, Timothy', 'Alvarez, Evan', 'Willis, Andre', 'Holloway, Ronald']",True,
-1528,IAH,IAH,73G,IAH → IAH,2025-09-13 21:41:00,2025-09-13 08:43:00,A1,Medium,-778.0,4,4.0,"['EMP030', 'EMP036', 'EMP035', 'EMP034']","['Guye, Senna', 'Macaraig, Aiden', 'Hernandez Chavez, Luis', 'Ibrahim, Hilal']",True,
-5714,ORD,EWR,E70,ORD → EWR,2025-09-13 06:04:00,2025-09-13 07:05:00,A4,Light,61.0,3,3.0,"['EMP020', 'EMP019', 'EMP001']","['Rosario Valdes, Jennysha', 'White, Christian', 'Garner, Cara']",True,
-7279,EWR,DEN,37E,EWR → DEN,2025-09-13 07:05:00,2025-09-13 08:10:00,A3,Light,65.0,3,3.0,"['EMP021', 'EMP004', 'EMP006']","['Ahemed, Habib', 'Salman, Omed', 'Hernandez Chavez, Luis']",True,
-4892,DEN,EWR,195,DEN → EWR,2025-09-13 08:10:00,2025-09-13 11:26:00,A2,Light,196.0,3,3.0,"['EMP011', 'EMP012', 'EMP013']","['Vale, Erick', 'Wilkerson, Jaylan', 'Harris, Nakia']",True,
-1428,EWR,EWR,37E,EWR → EWR,2025-09-13 08:38:00,2025-09-13 09:45:00,A2,Light,67.0,3,3.0,"['EMP005', 'EMP007', 'EMP008']","['Elley, Arson', 'Sheikh, Mohamed', 'Gostomski, Ross']",True,
-4897,DEN,ORD,195,DEN → ORD,2025-09-13 08:43:00,2025-09-13 09:36:00,A1,Light,53.0,3,3.0,"['EMP009', 'EMP010', 'EMP014']","['Fuimaono, Sulufaleese', 'Mustafa, Sirwan', 'Lafquen, Jose']",True,
-1944,ORD,MCO,73G,ORD → MCO,2025-09-13 08:57:00,2025-09-13 09:54:00,A3,Light,57.0,3,3.0,"['EMP015', 'EMP016', 'EMP017']","['Hussein, Mkufu', 'Villanueva, Rodolfo', 'Alvarez, Evan']",True,
-2174,ORD,EWR,195,ORD → EWR,2025-09-13 09:36:00,2025-09-13 10:36:00,A2,Light,60.0,3,3.0,"['EMP023', 'EMP018', 'EMP020']","['Martin, Joshua', 'Ibrahim, Hilal', 'Rosario Valdes, Jennysha']",True,
-601,EWR,EWR,195,EWR → EWR,2025-09-13 11:26:00,2025-09-13 10:36:00,A2,Light,-50.0,3,3.0,"['EMP019', 'EMP024', 'EMP001']","['White, Christian', 'Manghane, Kechell', 'Garner, Cara']",True,
-2414,ORD,ORD,19F,ORD → ORD,2025-09-13 12:35:00,2025-09-13 12:36:00,A3,Light,1.0,3,3.0,"['EMP028', 'EMP027', 'EMP030']","['Jakalski, Alec', 'Smith, Devin', 'Guye, Senna']",True,
-2180,EWR,MCO,73G,EWR → MCO,2025-09-13 13:30:00,2025-09-13 14:22:00,A1,Light,52.0,3,3.0,"['EMP031', 'EMP029', 'EMP033']","['Vale, Erick', 'Williams, Michael', 'Willis, Andre']",True,
-3406,ORD,ORD,E7F,ORD → ORD,2025-09-13 14:27:00,2025-09-13 15:50:00,A2,Light,83.0,3,,,,False,Insufficient employees: 0/3
-499,SFO,ORD,20C,SFO → ORD,2025-09-13 15:29:00,2025-09-13 16:34:00,A3,Light,65.0,3,3.0,"['EMP039', 'EMP037', 'EMP041']","['Gostomski, Ross', 'Corkern, Timothy', 'Sagoe, Secondous']",True,
-2430,ORD,ORD,73G,ORD → ORD,2025-09-13 15:40:00,2025-09-13 16:57:00,A7,Light,77.0,3,3.0,"['EMP040', 'EMP032', 'EMP039']","['Wubeshet, Leule', 'Holloway, Ronald', 'Gostomski, Ross']",True,
-1608,EWR,EWR,37E,EWR → EWR,2025-09-13 15:55:00,2025-09-13 19:27:00,A3,Light,212.0,3,3.0,"['EMP040', 'EMP041', 'EMP024']","['Wubeshet, Leule', 'Sagoe, Secondous', 'Manghane, Kechell']",True,
-2454,EWR,EWR,37E,EWR → EWR,2025-09-13 17:53:00,2025-09-13 07:14:00,A2,Light,-639.0,3,,,,False,Insufficient employees: 0/3
-1006,ORD,ORD,73G,ORD → ORD,2025-09-13 19:39:00,2025-09-13 07:45:00,A8,Light,-714.0,3,,,,False,Insufficient employees: 0/3
-1300,DEN,ORD,20S,DEN → ORD,2025-09-13 21:15:00,2025-09-13 06:10:00,A3,Light,-905.0,3,,,,False,Insufficient employees: 0/3
-5327,ORD,DEN,E75,ORD → DEN,2025-09-13 22:59:00,2025-09-13 08:10:00,A3,Light,-889.0,3,,,,False,Insufficient employees: 0/3
+flight_id,inbound_city,outbound_city,aircraft,flight_route,eta,etd,gate,heaviness,turnaround_minutes,required_team_size,assigned_team_size,team_ids,team_names,assignment_success
+3728,IAH,IAD,73G,IAH → IAD,2025-09-13 06:10:00,2025-09-13 07:45:00,A1,Medium,95.0,4,4,"['EMP001', 'EMP003', 'EMP004', 'EMP005']","['Garner, Cara', 'Ibrahim, Herman', 'Salman, Omed', 'Elley, Arson']",True
+7570,EWR,SFO,37S,EWR → SFO,2025-09-13 06:30:00,2025-09-13 06:45:00,A2,Medium,15.0,4,4,"['EMP002', 'EMP008', 'EMP007', 'EMP006']","['Zewude, Besufekad', 'Gostomski, Ross', 'Sheikh, Mohamed', 'Hernandez Chavez, Luis']",True
+4883,SFO,EWR,320,SFO → EWR,2025-09-13 06:45:00,2025-09-13 09:45:00,A2,Medium,180.0,4,4,"['EMP009', 'EMP010', 'EMP016', 'EMP015']","['Fuimaono, Sulufaleese', 'Mustafa, Sirwan', 'Villanueva, Rodolfo', 'Hussein, Mkufu']",True
+3730,IAD,DEN,73G,IAD → DEN,2025-09-13 07:45:00,2025-09-13 08:10:00,A3,Medium,25.0,4,4,"['EMP014', 'EMP013', 'EMP012', 'EMP017']","['Lafquen, Jose', 'Harris, Nakia', 'Wilkerson, Jaylan', 'Alvarez, Evan']",True
+4892,DEN,IAD,195,DEN → IAD,2025-09-13 08:10:00,2025-09-13 09:21:00,A4,Medium,71.0,4,4,"['EMP018', 'EMP011', 'EMP020', 'EMP019']","['Ibrahim, Hilal', 'Vale, Erick', 'Rosario Valdes, Jennysha', 'White, Christian']",True
+N1557Y,IAH,DEN,E75,IAH → DEN,2025-09-13 08:34:00,2025-09-13 10:36:00,A4,Medium,122.0,4,4,"['EMP021', 'EMP001', 'EMP012', 'EMP011']","['Ahemed, Habib', 'Garner, Cara', 'Wilkerson, Jaylan', 'Vale, Erick']",True
+2336,IAD,DEN,195,IAD → DEN,2025-09-13 09:21:00,2025-09-13 10:26:00,A4,Medium,65.0,4,4,"['EMP023', 'EMP024', 'EMP022', 'EMP004']","['Martin, Joshua', 'Manghane, Kechell', 'Jakalski, Alec', 'Salman, Omed']",True
+1633,DEN,DEN,73G,DEN → DEN,2025-09-13 13:18:00,2025-09-13 14:05:00,A4,Medium,47.0,4,4,"['EMP026', 'EMP029', 'EMP028', 'EMP027']","['Muhsman, Joshua', 'Williams, Michael', 'Jakalski, Alec', 'Smith, Devin']",True
+1858,DEN,DEN,19F,DEN → DEN,2025-09-13 13:52:00,2025-09-13 17:30:00,A1,Medium,218.0,4,4,"['EMP033', 'EMP032', 'EMP031', 'EMP030']","['Willis, Andre', 'Holloway, Ronald', 'Vale, Erick', 'Guye, Senna']",True
+6187,IAH,IAH,E7A,IAH → IAH,2025-09-13 14:09:00,2025-09-13 14:51:00,A4,Medium,42.0,4,4,"['EMP035', 'EMP036', 'EMP034', 'EMP024']","['Hernandez Chavez, Luis', 'Macaraig, Aiden', 'Ibrahim, Hilal', 'Manghane, Kechell']",True
+522,SEA,ORD,319,SEA → ORD,2025-09-13 15:52:00,2025-09-13 17:10:00,A2,Medium,78.0,4,4,"['EMP038', 'EMP039', 'EMP040', 'EMP041']","['Garner, Cara', 'Gostomski, Ross', 'Wubeshet, Leule', 'Sagoe, Secondous']",True
+222,IAH,IAH,73G,IAH → IAH,2025-09-13 16:36:00,2025-09-13 18:30:00,A8,Medium,114.0,4,4,"['EMP037', 'EMP027', 'EMP029', 'EMP028']","['Corkern, Timothy', 'Smith, Devin', 'Williams, Michael', 'Jakalski, Alec']",True
+2349,IAD,IAD,20S,IAD → IAD,2025-09-13 18:38:00,2025-09-13 08:30:00,A4,Medium,-608.0,4,4,"['EMP025', 'EMP045', 'EMP007', 'EMP003']","['Ahemed, Habib', 'Arebo, Muaz', 'Sheikh, Mohamed', 'Ibrahim, Herman']",True
+4785,IAH,EWR,E70,IAH → EWR,2025-09-13 20:29:00,2025-09-13 06:00:00,A3,Medium,-869.0,4,4,"['EMP048', 'EMP002', 'EMP006', 'EMP008']","['Corkern, Timothy', 'Zewude, Besufekad', 'Hernandez Chavez, Luis', 'Gostomski, Ross']",True
+1708,EWR,SEA,37X,EWR → SEA,2025-09-13 20:58:00,2025-09-13 09:00:00,A7,Medium,-718.0,4,4,"['EMP005', 'EMP009', 'EMP017', 'EMP016']","['Elley, Arson', 'Fuimaono, Sulufaleese', 'Alvarez, Evan', 'Villanueva, Rodolfo']",True
+1528,IAH,IAH,73G,IAH → IAH,2025-09-13 21:41:00,2025-09-13 08:43:00,A1,Medium,-778.0,4,4,"['EMP014', 'EMP015', 'EMP013', 'EMP010']","['Lafquen, Jose', 'Hussein, Mkufu', 'Harris, Nakia', 'Mustafa, Sirwan']",True
+382,SEA,SEA,,SEA → SEA,2025-09-13 23:59:00,2025-09-13 09:00:00,A1,Medium,-899.0,4,4,"['EMP030', 'EMP026', 'EMP023', 'EMP022']","['Guye, Senna', 'Muhsman, Joshua', 'Martin, Joshua', 'Jakalski, Alec']",True
+5714,ORD,EWR,E70,ORD → EWR,2025-09-13 06:04:00,2025-09-13 07:05:00,A4,Light,61.0,3,3,"['EMP019', 'EMP020', 'EMP018']","['White, Christian', 'Rosario Valdes, Jennysha', 'Ibrahim, Hilal']",True
+7279,EWR,DEN,37E,EWR → DEN,2025-09-13 07:05:00,2025-09-13 08:10:00,A3,Light,65.0,3,3,"['EMP021', 'EMP001', 'EMP004']","['Ahemed, Habib', 'Garner, Cara', 'Salman, Omed']",True
+4892,DEN,EWR,195,DEN → EWR,2025-09-13 08:10:00,2025-09-13 11:26:00,A2,Light,196.0,3,3,"['EMP011', 'EMP012', 'EMP013']","['Vale, Erick', 'Wilkerson, Jaylan', 'Harris, Nakia']",True
+1428,EWR,EWR,37E,EWR → EWR,2025-09-13 08:38:00,2025-09-13 09:45:00,A2,Light,67.0,3,3,"['EMP006', 'EMP005', 'EMP008']","['Hernandez Chavez, Luis', 'Elley, Arson', 'Gostomski, Ross']",True
+4897,DEN,ORD,195,DEN → ORD,2025-09-13 08:43:00,2025-09-13 09:36:00,A1,Light,53.0,3,3,"['EMP009', 'EMP010', 'EMP007']","['Fuimaono, Sulufaleese', 'Mustafa, Sirwan', 'Sheikh, Mohamed']",True
+1944,ORD,MCO,73G,ORD → MCO,2025-09-13 08:57:00,2025-09-13 09:54:00,A3,Light,57.0,3,3,"['EMP015', 'EMP016', 'EMP017']","['Hussein, Mkufu', 'Villanueva, Rodolfo', 'Alvarez, Evan']",True
+2174,ORD,EWR,195,ORD → EWR,2025-09-13 09:36:00,2025-09-13 10:36:00,A2,Light,60.0,3,3,"['EMP014', 'EMP020', 'EMP024']","['Lafquen, Jose', 'Rosario Valdes, Jennysha', 'Manghane, Kechell']",True
+601,EWR,EWR,195,EWR → EWR,2025-09-13 11:26:00,2025-09-13 10:36:00,A2,Light,-50.0,3,3,"['EMP023', 'EMP021', 'EMP019']","['Martin, Joshua', 'Ahemed, Habib', 'White, Christian']",True
+2414,ORD,ORD,19F,ORD → ORD,2025-09-13 12:35:00,2025-09-13 12:36:00,A3,Light,1.0,3,3,"['EMP034', 'EMP033', 'EMP032']","['Ibrahim, Hilal', 'Willis, Andre', 'Holloway, Ronald']",True
+2180,EWR,MCO,73G,EWR → MCO,2025-09-13 13:30:00,2025-09-13 14:22:00,A1,Light,52.0,3,3,"['EMP031', 'EMP035', 'EMP028']","['Vale, Erick', 'Hernandez Chavez, Luis', 'Jakalski, Alec']",True
+3406,ORD,ORD,E7F,ORD → ORD,2025-09-13 14:27:00,2025-09-13 15:50:00,A2,Light,83.0,3,3,"['EMP036', 'EMP027', 'EMP031']","['Macaraig, Aiden', 'Smith, Devin', 'Vale, Erick']",True
+499,SFO,ORD,20C,SFO → ORD,2025-09-13 15:29:00,2025-09-13 16:34:00,A3,Light,65.0,3,3,"['EMP038', 'EMP039', 'EMP040']","['Garner, Cara', 'Gostomski, Ross', 'Wubeshet, Leule']",True
+2430,ORD,ORD,73G,ORD → ORD,2025-09-13 15:40:00,2025-09-13 16:57:00,A7,Light,77.0,3,3,"['EMP041', 'EMP037', 'EMP029']","['Sagoe, Secondous', 'Corkern, Timothy', 'Williams, Michael']",True
+1608,EWR,EWR,37E,EWR → EWR,2025-09-13 15:55:00,2025-09-13 19:27:00,A3,Light,212.0,3,3,"['EMP032', 'EMP033', 'EMP036']","['Holloway, Ronald', 'Willis, Andre', 'Macaraig, Aiden']",True
+2454,EWR,EWR,37E,EWR → EWR,2025-09-13 17:53:00,2025-09-13 07:14:00,A2,Light,-639.0,3,3,"['EMP045', 'EMP003', 'EMP035']","['Arebo, Muaz', 'Ibrahim, Herman', 'Hernandez Chavez, Luis']",True
+1006,ORD,ORD,73G,ORD → ORD,2025-09-13 19:39:00,2025-09-13 07:45:00,A8,Light,-714.0,3,3,"['EMP048', 'EMP018', 'EMP037']","['Corkern, Timothy', 'Ibrahim, Hilal', 'Corkern, Timothy']",True
+1300,DEN,ORD,20S,DEN → ORD,2025-09-13 21:15:00,2025-09-13 06:10:00,A3,Light,-905.0,3,3,"['EMP034', 'EMP040', 'EMP039']","['Ibrahim, Hilal', 'Wubeshet, Leule', 'Gostomski, Ross']",True
+5327,ORD,DEN,E75,ORD → DEN,2025-09-13 22:59:00,2025-09-13 08:10:00,A3,Light,-889.0,3,3,"['EMP030', 'EMP041', 'EMP005']","['Guye, Senna', 'Sagoe, Secondous', 'Elley, Arson']",True
