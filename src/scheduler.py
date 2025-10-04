@@ -1,323 +1,290 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import numpy as np
+from team_manager import TeamManager
+from notification_system import NotificationSystem
 
-class Scheduler:
+class TeamBasedScheduler:
     def __init__(self, employee_handler, flight_handler):
-        """
-        Initialize the Scheduler with employee and flight handlers
-        
-        Args:
-            employee_handler: Instance of EmployeeHandler class
-            flight_handler: Instance of FlightHandler class
-        """
         self.employee_handler = employee_handler
         self.flight_handler = flight_handler
+        self.notification_system = NotificationSystem()
+        self.team_manager = TeamManager(self.notification_system)
         self.assignments = []
-        self.scheduling_results = {
-            'successful_assignments': 0,
-            'failed_assignments': 0,
-            'total_positions_filled': 0,
-            'unassigned_flights': []
-        }
-    
-    def run_scheduling(self):
+        self.unassigned_flights = []
+        
+    def initialize_shift(self, shift_start_time):
         """
-        Main scheduling method that assigns teams to all flights
-        """
-        print("🚀 STARTING FLIGHT TEAM SCHEDULING")
-        print("="*60)
-        
-        # Reset previous scheduling results
-        self.assignments = []
-        self.scheduling_results = {
-            'successful_assignments': 0,
-            'failed_assignments': 0,
-            'total_positions_filled': 0,
-            'unassigned_flights': []
-        }
-        
-        # Get all employees and flights
-        if self.employee_handler.employees_df is None:
-            print("❌ No employee data loaded!")
-            return False
-            
-        if self.flight_handler.flights_df is None:
-            print("❌ No flight data loaded!")
-            return False
-        
-        # Reset employee workloads at start of scheduling
-        self.employee_handler.reset_workload()
-        
-        # Get flights and sort by team size needed (heaviest first)
-        flights_df = self.flight_handler.flights_df.copy()
-        
-        # Add team size column for sorting
-        flights_df['required_team_size'] = flights_df['heaviness'].apply(
-            lambda x: self.flight_handler.get_team_size_needed(x)
-        )
-        
-        # Sort flights: Heavy flights first (need bigger teams)
-        flights_sorted = flights_df.sort_values(
-            ['required_team_size', 'eta_datetime'], 
-            ascending=[False, True]
-        )
-        
-        print(f"📋 Processing {len(flights_sorted)} flights...")
-        print(f"👥 Available employees: {len(self.employee_handler.employees_df)}")
-        print(f"⏰ Flight time range: {flights_sorted['eta_datetime'].min().strftime('%H:%M')} - {flights_sorted['eta_datetime'].max().strftime('%H:%M')}")
-        print("\n" + "="*60)
-        print("FLIGHT ASSIGNMENT PROCESS")
-        print("="*60)
-        
-        # Process each flight
-        for index, flight in flights_sorted.iterrows():
-            self._assign_flight(flight)
-        
-        # Print final results
-        self._print_scheduling_summary()
-        
-        return len(self.assignments) > 0
-    
-    def _assign_flight(self, flight):
-        """
-        Assign a team to a specific flight
-        
+        Initialize teams at shift start
         Args:
-            flight: Flight row from flights DataFrame
+            shift_start_time: datetime object (e.g., 2025-09-13 04:00:00)
         """
-        flight_id = flight.get('flight_number', 'Unknown')
+        teams, remainder = self.team_manager.form_initial_teams(
+            self.employee_handler.employees_df,
+            shift_start_time
+        )
+        
+        if teams is None:
+            return False, "Failed to form teams"
+        
+        print(f"✅ Formed {len(teams)} teams at shift start")
+        for team_name, team_data in teams.items():
+            print(f"   Team {team_name}: {len(team_data['members'])} members - {', '.join(team_data['member_names'])}")
+        
+        if remainder:
+            print(f"\n⚠️  {len(remainder)} remainder employees need assignment:")
+            for emp in remainder:
+                print(f"   - {emp['employee_name']}")
+        
+        return True, remainder
+    
+    def assign_flights_in_window(self, current_time, window_hours=4):
+        """
+        Assign teams to flights within the time window
+        Args:
+            current_time: Current time
+            window_hours: Look ahead window (default 4 hours)
+        """
+        window_end = current_time + timedelta(hours=window_hours)
+        
+        # Get flights in the window that aren't assigned yet
+        upcoming_flights = self.flight_handler.flights_df[
+            (self.flight_handler.flights_df['eta_datetime'] >= current_time) &
+            (self.flight_handler.flights_df['eta_datetime'] <= window_end)
+        ].copy()
+        
+        # Filter out already assigned flights
+        assigned_flight_ids = [a['flight_id'] for a in self.assignments if a.get('team_assigned')]
+        upcoming_flights = upcoming_flights[~upcoming_flights['flight_number'].isin(assigned_flight_ids)]
+        
+        # Sort by ETA
+        upcoming_flights = upcoming_flights.sort_values('eta_datetime')
+        
+        print(f"\n📋 Assigning {len(upcoming_flights)} flights in {window_hours}-hour window")
+        print(f"   Window: {current_time.strftime('%H:%M')} to {window_end.strftime('%H:%M')}")
+        
+        for _, flight in upcoming_flights.iterrows():
+            self._assign_team_to_flight(flight)
+        
+        return len(upcoming_flights)
+    
+    def _assign_team_to_flight(self, flight):
+        """Assign the best available team to a flight"""
+        flight_id = flight['flight_number']
+        eta = flight['eta_datetime']
+        etd = flight['etd_datetime']
         heaviness = flight.get('heaviness', 'Medium')
-        eta = flight.get('eta_datetime', 'Unknown')
-        etd = flight.get('etd_datetime', 'Unknown')
-        gate = flight.get('gate', 'Unknown')
         
-        required_team_size = self.flight_handler.get_team_size_needed(heaviness)
+        # Determine required team size
+        required_size = 4 if heaviness == 'Medium' else 3  # Medium=4, Light=3
         
-        print(f"✈️  Processing Flight {flight_id}")
-        print(f"    Route: {flight.get('city', 'Unknown')} → {flight.get('outbound_city', 'Unknown')}")
-        print(f"    Aircraft: {flight.get('aircraft', 'Unknown')}")
-        print(f"    Time: {eta.strftime('%H:%M') if hasattr(eta, 'strftime') else eta} - {etd.strftime('%H:%M') if hasattr(etd, 'strftime') else etd}")
-        print(f"    Heaviness: {heaviness} (needs {required_team_size} people)")
-        print(f"    Gate: {gate}")
+        # Get available teams
+        available_teams = self.team_manager.get_available_teams(eta)
         
-        # Find available employees for this flight time
-        available_employees = self.employee_handler.find_available_employees(eta, etd)
+        if not available_teams:
+            print(f"   ❌ Flight {flight_id} ({eta.strftime('%H:%M')}) - No teams available")
+            self.unassigned_flights.append(flight_id)
+            self._record_assignment(flight, None, False, "No teams available")
+            return False
         
-        if len(available_employees) == 0:
-            print(f"    ❌ No employees available for this time slot")
-            self._record_failed_assignment(flight, "No employees available for time slot")
-            return
+        # Filter teams by size requirement
+        suitable_teams = [t for t in available_teams if t['size'] >= required_size]
         
-        print(f"    👥 {len(available_employees)} employees available for this time")
+        # If no suitable teams, use any available team
+        if not suitable_teams:
+            suitable_teams = available_teams
         
-        # Find the best team
-        selected_team = self.find_best_team(required_team_size, available_employees)
+        # Select team with lowest flight count (fairness)
+        suitable_teams.sort(key=lambda x: x['flight_count'])
+        selected_team = suitable_teams[0]
         
-        if len(selected_team) < required_team_size:
-            print(f"    ❌ Only {len(selected_team)}/{required_team_size} employees available")
-            self._record_failed_assignment(flight, f"Insufficient employees: {len(selected_team)}/{required_team_size}")
-            return
+        # Assign team to flight
+        self.team_manager.assign_team_to_flight(selected_team['name'], flight)
         
-        # Assign the team
-        team_names = []
-        for emp_id in selected_team:
-            self.employee_handler.assign_flight_to_employee(emp_id)
-            emp_name = self.employee_handler.employees_df[
-                self.employee_handler.employees_df['employee_id'] == emp_id
-            ]['employee_name'].iloc[0]
-            team_names.append(emp_name)
+        # Record assignment
+        self._record_assignment(flight, selected_team, True, None)
         
-        # Record the assignment
+        print(f"   ✅ Flight {flight_id} ({eta.strftime('%H:%M')}) → Team {selected_team['name']} (Count: {selected_team['flight_count']})")
+        
+        # Mark flight as complete when ETD passes
+        self.team_manager.complete_flight(selected_team['name'], etd)
+        
+        return True
+    
+    def _record_assignment(self, flight, team, success, failure_reason=None):
+        """Record a flight assignment"""
         assignment = {
-            'flight_id': flight_id,
+            'flight_id': flight['flight_number'],
             'inbound_city': flight.get('city', 'Unknown'),
             'outbound_city': flight.get('outbound_city', 'Unknown'),
             'aircraft': flight.get('aircraft', 'Unknown'),
             'flight_route': f"{flight.get('city', 'Unknown')} → {flight.get('outbound_city', 'Unknown')}",
-            'eta': eta,
-            'etd': etd,
-            'gate': gate,
-            'heaviness': heaviness,
-            'turnaround_minutes': flight.get('turnaround_minutes', 0),
-            'required_team_size': required_team_size,
-            'assigned_team_size': len(selected_team),
-            'team_ids': selected_team,
-            'team_names': team_names,
-            'assignment_success': True
-        }
-        
-        self.assignments.append(assignment)
-        self.scheduling_results['successful_assignments'] += 1
-        self.scheduling_results['total_positions_filled'] += len(selected_team)
-        
-        print(f"    ✅ SUCCESS! Assigned team: {', '.join(team_names)}")
-        print()
-    
-    def find_best_team(self, required_size, available_employees):
-        """
-        Find the best team from available employees
-        
-        Args:
-            required_size: Number of employees needed
-            available_employees: DataFrame of available employees
-            
-        Returns:
-            List of employee IDs for the selected team
-        """
-        if len(available_employees) < required_size:
-            return []
-        
-        # Create a copy with current workload information
-        team_candidates = available_employees.copy()
-        
-        # Add current workload to the dataframe
-        team_candidates['current_workload'] = team_candidates['employee_id'].map(
-            lambda x: self.employee_handler.workload_tracker.get(x, 0)
-        )
-        
-        # Sort by current workload (lowest first)
-        team_candidates_sorted = team_candidates.sort_values(
-            'current_workload',    # Lowest workload first (primary)
-            ascending=True
-        )
-        
-        # Select the top candidates
-        selected_team = team_candidates_sorted.head(required_size)
-        
-        return selected_team['employee_id'].tolist()
-    
-    def _record_failed_assignment(self, flight, reason):
-        """Record a failed flight assignment"""
-        flight_id = flight.get('flight_number', 'Unknown')
-        
-        failed_assignment = {
-            'flight_id': flight_id,
-            'inbound_city': flight.get('city', 'Unknown'),
-            'outbound_city': flight.get('outbound_city', 'Unknown'),
-            'aircraft': flight.get('aircraft', 'Unknown'),
-            'flight_route': f"{flight.get('city', 'Unknown')} → {flight.get('outbound_city', 'Unknown')}",
-            'eta': flight.get('eta_datetime', 'Unknown'),
-            'etd': flight.get('etd_datetime', 'Unknown'),
+            'eta': flight['eta_datetime'],
+            'etd': flight['etd_datetime'],
             'gate': flight.get('gate', 'Unknown'),
             'heaviness': flight.get('heaviness', 'Medium'),
             'turnaround_minutes': flight.get('turnaround_minutes', 0),
-            'required_team_size': self.flight_handler.get_team_size_needed(flight.get('heaviness', 'Medium')),
-            'failure_reason': reason,
-            'assignment_success': False
+            'team_assigned': team['name'] if team else None,
+            'team_members': team['members'] if team else [],
+            'assignment_success': success,
+            'failure_reason': failure_reason
         }
         
-        self.assignments.append(failed_assignment)
-        self.scheduling_results['failed_assignments'] += 1
-        self.scheduling_results['unassigned_flights'].append(flight_id)
+        self.assignments.append(assignment)
     
-    def _print_scheduling_summary(self):
-        """Print a summary of the scheduling results"""
-        print("\n" + "="*60)
-        print("📊 SCHEDULING SUMMARY")
-        print("="*60)
+    def check_for_team_changes(self, current_time):
+        """
+        Check for team membership changes and create notifications
+        This should be called periodically (every 5-10 minutes) during operations
+        """
+        notification_ids = self.team_manager.detect_and_notify_changes(
+            self.employee_handler.employees_df,
+            current_time
+        )
         
-        total_flights = len(self.assignments)
-        successful = self.scheduling_results['successful_assignments']
-        failed = self.scheduling_results['failed_assignments']
-        
-        print(f"Total Flights Processed: {total_flights}")
-        print(f"✅ Successfully Assigned: {successful} ({successful/total_flights*100:.1f}%)")
-        print(f"❌ Failed Assignments: {failed} ({failed/total_flights*100:.1f}%)")
-        print(f"👥 Total Team Positions Filled: {self.scheduling_results['total_positions_filled']}")
-        
-        if failed > 0:
-            print(f"\n⚠️  Unassigned Flights: {', '.join(map(str, self.scheduling_results['unassigned_flights']))}")
-        
-        # Employee workload summary
-        workload_summary = self.employee_handler.get_workload_summary()
-        if workload_summary is not None:
-            avg_utilization = workload_summary['utilization_pct'].mean()
-            max_utilization = workload_summary['utilization_pct'].max()
-            print(f"\n👥 EMPLOYEE UTILIZATION:")
-            print(f"Average Utilization: {avg_utilization:.1f}%")
-            print(f"Peak Utilization: {max_utilization:.1f}%")
+        if notification_ids:
+            print(f"\n🔔 {len(notification_ids)} new notification(s) created")
             
-            # Show employees at capacity
-            overworked = workload_summary[workload_summary['utilization_pct'] >= 100]
-            if len(overworked) > 0:
-                print(f"⚠️  Employees at/over capacity: {len(overworked)}")
+        return notification_ids
     
-    def get_assignments_dataframe(self):
-        """Return assignments as a pandas DataFrame"""
-        if not self.assignments:
-            return pd.DataFrame()
+    def get_pending_notifications(self):
+        """Get all pending notifications for display"""
+        return self.notification_system.get_pending_notifications()
+    
+    def approve_team_change(self, notification_id, manual_team_assignment=None):
+        """
+        Approve a team change notification
+        Args:
+            notification_id: ID of notification to approve
+            manual_team_assignment: Optional - manually specify which team for 'team_join' notifications
+        """
+        success, notification = self.notification_system.approve_notification(
+            notification_id,
+            manual_override={'team': manual_team_assignment} if manual_team_assignment else None
+        )
         
-        return pd.DataFrame(self.assignments)
+        if not success:
+            return False, "Notification not found"
+        
+        # Apply the change to teams
+        notif_type = notification['type']
+        data = notification['data']
+        
+        if notif_type == 'team_replacement':
+            # Remove leaving member, add joining member
+            team_name = data['team_name']
+            leaving_id = data['leaving_id']
+            joining_employee = self.employee_handler.employees_df[
+                self.employee_handler.employees_df['employee_id'] == data['joining_id']
+            ].iloc[0].to_dict()
+            
+            # Remove leaving member
+            self.team_manager.teams[team_name]['members'] = [
+                m for m in self.team_manager.teams[team_name]['members']
+                if m['employee_id'] != leaving_id
+            ]
+            
+            # Add joining member
+            self.team_manager.teams[team_name]['members'].append(joining_employee)
+            self.team_manager.teams[team_name]['member_ids'] = [m['employee_id'] for m in self.team_manager.teams[team_name]['members']]
+            self.team_manager.teams[team_name]['member_names'] = [m['employee_name'] for m in self.team_manager.teams[team_name]['members']]
+            
+            print(f"✅ Approved: {data['joining_name']} replaced {data['leaving_name']} on Team {team_name}")
+            
+        elif notif_type == 'team_leave':
+            # Just remove the leaving member
+            team_name = data['team_name']
+            employee_id = data['employee_id']
+            
+            self.team_manager.teams[team_name]['members'] = [
+                m for m in self.team_manager.teams[team_name]['members']
+                if m['employee_id'] != employee_id
+            ]
+            self.team_manager.teams[team_name]['member_ids'] = [m['employee_id'] for m in self.team_manager.teams[team_name]['members']]
+            self.team_manager.teams[team_name]['member_names'] = [m['employee_name'] for m in self.team_manager.teams[team_name]['members']]
+            self.team_manager.teams[team_name]['size'] = len(self.team_manager.teams[team_name]['members'])
+            
+            print(f"✅ Approved: {data['employee_name']} left Team {team_name}")
+            
+        elif notif_type == 'team_join':
+            # Add person to team
+            target_team = manual_team_assignment if manual_team_assignment else data.get('suggested_team')
+            
+            if not target_team or target_team == 'TBD':
+                return False, "No team specified for new employee"
+            
+            joining_employee = self.employee_handler.employees_df[
+                self.employee_handler.employees_df['employee_id'] == data['employee_id']
+            ].iloc[0].to_dict()
+            
+            self.team_manager.teams[target_team]['members'].append(joining_employee)
+            self.team_manager.teams[target_team]['member_ids'].append(data['employee_id'])
+            self.team_manager.teams[target_team]['member_names'].append(data['employee_name'])
+            self.team_manager.teams[target_team]['size'] = len(self.team_manager.teams[target_team]['members'])
+            
+            print(f"✅ Approved: {data['employee_name']} joined Team {target_team}")
+        
+        return True, "Change applied successfully"
+        """Get summary of all assignments"""
+        summary = {
+            'total_flights': len(self.assignments),
+            'assigned_flights': len([a for a in self.assignments if a['assignment_success']]),
+            'unassigned_flights': len(self.unassigned_flights),
+            'teams': self.team_manager.get_team_summary()
+        }
+        
+        return summary
     
-    def export_schedule(self, filename="daily_schedule.csv"):
-        """Export the complete schedule to CSV"""
+    def export_schedule(self, filename="../team_schedule.csv"):
+        """Export the schedule to CSV"""
         if not self.assignments:
             print("❌ No assignments to export!")
             return False
         
-        schedule_df = self.get_assignments_dataframe()
+        export_data = []
+        for assignment in self.assignments:
+            export_data.append({
+                'Flight': assignment['flight_id'],
+                'Route': assignment['flight_route'],
+                'ETA': assignment['eta'].strftime('%H:%M') if hasattr(assignment['eta'], 'strftime') else str(assignment['eta']),
+                'ETD': assignment['etd'].strftime('%H:%M') if hasattr(assignment['etd'], 'strftime') else str(assignment['etd']),
+                'Gate': assignment['gate'],
+                'Aircraft': assignment['aircraft'],
+                'Heaviness': assignment['heaviness'],
+                'Team': assignment['team_assigned'] if assignment['team_assigned'] else 'UNASSIGNED',
+                'Team Members': ', '.join(assignment['team_members']) if assignment['team_members'] else '',
+                'Status': '✅' if assignment['assignment_success'] else '❌'
+            })
+        
+        schedule_df = pd.DataFrame(export_data)
         schedule_df.to_csv(filename, index=False)
         print(f"✅ Schedule exported to {filename}")
         return True
     
-    def get_schedule_by_employee(self):
-        """Get schedule organized by employee (useful for individual schedules)"""
-        if not self.assignments:
-            return {}
+    def print_schedule(self):
+        """Print the complete schedule"""
+        print("\n" + "="*80)
+        print("TEAM-BASED FLIGHT SCHEDULE")
+        print("="*80)
         
-        employee_schedules = {}
-        
-        for assignment in self.assignments:
-            if assignment['assignment_success']:
-                for i, emp_id in enumerate(assignment['team_ids']):
-                    emp_name = assignment['team_names'][i]
-                    
-                    if emp_id not in employee_schedules:
-                        employee_schedules[emp_id] = {
-                            'employee_name': emp_name,
-                            'flights': []
-                        }
-                    
-                    employee_schedules[emp_id]['flights'].append({
-                        'flight_id': assignment['flight_id'],
-                        'inbound_city': assignment['inbound_city'],
-                        'outbound_city': assignment['outbound_city'],
-                        'aircraft': assignment['aircraft'],
-                        'route': assignment['flight_route'],
-                        'eta': assignment['eta'],
-                        'etd': assignment['etd'],
-                        'gate': assignment['gate'],
-                        'heaviness': assignment['heaviness'],
-                        'turnaround_minutes': assignment['turnaround_minutes']
-                    })
-        
-        return employee_schedules
-    
-    def print_employee_schedules(self):
-        """Print individual employee schedules"""
-        employee_schedules = self.get_schedule_by_employee()
-        
-        if not employee_schedules:
-            print("❌ No employee schedules available!")
-            return
-        
-        print("\n" + "="*60)
-        print("👥 INDIVIDUAL EMPLOYEE SCHEDULES")
-        print("="*60)
-        
-        for emp_id, schedule in employee_schedules.items():
-            print(f"\n{schedule['employee_name']} ({emp_id}):")
-            print(f"  Flights assigned: {len(schedule['flights'])}")
+        for assignment in sorted(self.assignments, key=lambda x: x['eta']):
+            eta_str = assignment['eta'].strftime('%H:%M') if hasattr(assignment['eta'], 'strftime') else str(assignment['eta'])
+            etd_str = assignment['etd'].strftime('%H:%M') if hasattr(assignment['etd'], 'strftime') else str(assignment['etd'])
             
-            for flight in sorted(schedule['flights'], key=lambda x: x['eta']):
-                eta_time = flight['eta'].strftime('%H:%M') if hasattr(flight['eta'], 'strftime') else flight['eta']
-                etd_time = flight['etd'].strftime('%H:%M') if hasattr(flight['etd'], 'strftime') else flight['etd']
-                turnaround = f" ({flight['turnaround_minutes']:.0f}min)" if flight['turnaround_minutes'] else ""
-                print(f"    • Flight {flight['flight_id']} ({flight['heaviness']})")
-                print(f"      {flight['route']} | {eta_time}-{etd_time}{turnaround} | Gate {flight['gate']} | {flight['aircraft']}")
+            status = "✅" if assignment['assignment_success'] else "❌"
+            team = assignment['team_assigned'] if assignment['team_assigned'] else "UNASSIGNED"
+            
+            print(f"{status} Flight {assignment['flight_id']:<6} | {eta_str}-{etd_str} | Gate {assignment['gate']:<3} | Team {team:<6} | {assignment['flight_route']}")
+        
+        # Print team summary
+        print("\n" + "="*80)
+        print("TEAM WORKLOAD SUMMARY")
+        print("="*80)
+        
+        for team_info in self.team_manager.get_team_summary():
+            print(f"Team {team_info['team_name']}: {team_info['flight_count']} flights | {team_info['size']} members | {team_info['current_status']}")
+            print(f"   Members: {', '.join(team_info['members'])}")
 
 if __name__ == "__main__":
-    print("Scheduler class ready!")
-    print("To use: import this file and create Scheduler(employee_handler, flight_handler)")
-    print("Then call scheduler.run_scheduling()")
+    print("TeamBasedScheduler class ready!")
+    print("Run team-based scheduling with persistent teams")
