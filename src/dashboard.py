@@ -113,14 +113,17 @@ else:
         teams = scheduler.team_manager.teams
         
         # Display proposed teams
-        cols = st.columns(len(teams))
-        for idx, (team_name, team_data) in enumerate(teams.items()):
-            with cols[idx]:
-                st.subheader(f"Team {team_name}")
-                st.write(f"**Size:** {team_data['size']} members")
-                
-                for i, member_name in enumerate(team_data['member_names'], 1):
-                    st.write(f"{i}. {flip_name(member_name)}")
+        if len(teams) == 0:
+            st.error("No teams were formed. Check if employees are available at shift start time.")
+        else:
+            cols = st.columns(len(teams))
+            for idx, (team_name, team_data) in enumerate(teams.items()):
+                with cols[idx]:
+                    st.subheader(f"Team {team_name}")
+                    st.write(f"**Size:** {team_data['size']} members")
+                    
+                    for i, member_name in enumerate(team_data['member_names'], 1):
+                        st.write(f"{i}. {flip_name(member_name)}")
         
         # Manual team adjustment
         st.divider()
