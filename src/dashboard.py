@@ -108,19 +108,54 @@ else:
     
     # Team approval flow
     if not st.session_state.teams_approved:
-        st.header("Team Formation - Pending Approval")
+        st.header("Pre-Approval: Review Teams and Flight Schedule")
+        
+        # Show all flights in table format
+        st.subheader("Today's Flight Schedule")
+        
+        flights_df = scheduler.flight_handler.flights_df
+        
+        # Create display table
+        flight_table_data = []
+        for _, flight in flights_df.iterrows():
+            flight_table_data.append({
+                'Arrival Flight #': flight['flight_number'],
+                'Departure Flight #': flight.get('outbound_flight', 'N/A'),
+                'Gate': flight.get('gate', 'N/A'),
+                'ETA': flight['eta_datetime'].strftime('%H:%M') if hasattr(flight['eta_datetime'], 'strftime') else str(flight.get('eta', 'N/A')),
+                'ETD': flight['etd_datetime'].strftime('%H:%M') if hasattr(flight['etd_datetime'], 'strftime') else str(flight.get('etd', 'N/A')),
+                'Inbound City': flight.get('city', 'N/A'),
+                'Outbound City': flight.get('outbound_city', 'N/A'),
+                'Heaviness': flight.get('heaviness', 'Medium')
+            })
+        
+        flight_table_df = pd.DataFrame(flight_table_data)
+        st.dataframe(flight_table_df, use_container_width=True, hide_index=True)
+        
+        st.divider()
+        
+        # Show proposed teams
+        st.subheader("Proposed Ramp Teams")
         
         teams = scheduler.team_manager.teams
         
+<<<<<<< HEAD
         # Display proposed teams
+=======
+>>>>>>> d0302a760712868c0ae3479513f7e1d11cbd12c1
         if len(teams) == 0:
             st.error("No teams were formed. Check if employees are available at shift start time.")
         else:
             cols = st.columns(len(teams))
             for idx, (team_name, team_data) in enumerate(teams.items()):
                 with cols[idx]:
+<<<<<<< HEAD
                     st.subheader(f"Team {team_name}")
                     st.write(f"**Size:** {team_data['size']} members")
+=======
+                    st.markdown(f"**Team {team_name}**")
+                    st.write(f"Size: {team_data['size']} members")
+>>>>>>> d0302a760712868c0ae3479513f7e1d11cbd12c1
                     
                     for i, member_name in enumerate(team_data['member_names'], 1):
                         st.write(f"{i}. {flip_name(member_name)}")
@@ -129,37 +164,43 @@ else:
         st.divider()
         st.subheader("Manual Team Adjustments")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            from_team = st.selectbox("From Team:", list(teams.keys()), key="from_team")
-        with col2:
-            # Get members of selected team
-            if from_team in teams:
-                member_names = [flip_name(m) for m in teams[from_team]['member_names']]
-                selected_member = st.selectbox("Employee:", member_names, key="employee_move")
-                # Find the employee_id for the selected name
-                employee_id = None
-                for member in teams[from_team]['members']:
-                    if flip_name(member['employee_name']) == selected_member:
-                        employee_id = member['employee_id']
-                        break
-        with col3:
-            to_team = st.selectbox("To Team:", [t for t in teams.keys() if t != from_team], key="to_team")
-        
-        if st.button("Swap Employee"):
-            if employee_id:
-                success = scheduler.team_manager.manually_swap_members(from_team, to_team, employee_id)
-                if success:
-                    st.success(f"Moved {selected_member} from Team {from_team} to Team {to_team}")
-                    st.rerun()
+        if len(teams) > 0:
+            col1, col2, col3 = st.columns(3)
+            
+            employee_id = None  # Initialize outside the block
+            
+            with col1:
+                from_team = st.selectbox("From Team:", list(teams.keys()), key="from_team")
+            with col2:
+                # Get members of selected team
+                if from_team in teams:
+                    member_names = [flip_name(m) for m in teams[from_team]['member_names']]
+                    if member_names:  # Check if team has members
+                        selected_member = st.selectbox("Employee:", member_names, key="employee_move")
+                        # Find the employee_id for the selected name
+                        for member in teams[from_team]['members']:
+                            if flip_name(member['employee_name']) == selected_member:
+                                employee_id = member['employee_id']
+                                break
+            with col3:
+                to_team = st.selectbox("To Team:", [t for t in teams.keys() if t != from_team], key="to_team")
+            
+            if st.button("Swap Employee"):
+                if employee_id:
+                    success = scheduler.team_manager.manually_swap_members(from_team, to_team, employee_id)
+                    if success:
+                        st.success(f"Moved employee from Team {from_team} to Team {to_team}")
+                        st.rerun()
+                    else:
+                        st.error("Failed to swap employee")
                 else:
-                    st.error("Failed to swap employee")
+                    st.warning("No employee selected or team is empty")
         
         # Approve teams
         st.divider()
-        if st.button("✅ Approve Teams and Start Operations", type="primary"):
+        if st.button("Approve Teams and Begin Flight Assignments", type="primary", use_container_width=True):
             st.session_state.teams_approved = True
-            st.success("Teams approved! Operations started.")
+            st.success("Teams approved! You can now assign teams to flights.")
             st.rerun()
     
     else:
@@ -193,30 +234,74 @@ else:
             col4.metric("Active Teams", len(scheduler.team_manager.teams))
         
         with tab2:
-            st.header("Flight Schedule")
+            st.header("Flight Schedule with Team Assignments")
             
             if scheduler.assignments:
                 flight_data = []
                 for assignment in scheduler.assignments:
+                    eta_str = assignment['eta'].strftime('%H:%M') if hasattr(assignment['eta'], 'strftime') else 'N/A'
+                    etd_str = assignment['etd'].strftime('%H:%M') if hasattr(assignment['etd'], 'strftime') else 'N/A'
+                    
                     flight_data.append({
-                        'Flight': assignment['flight_id'],
-                        'Route': assignment['flight_route'],
-                        'ETA': assignment['eta'].strftime('%H:%M'),
-                        'ETD': assignment['etd'].strftime('%H:%M'),
+                        'Arrival Flight #': assignment['flight_id'],
+                        'Departure Flight #': assignment.get('outbound_flight', 'N/A'),
                         'Gate': assignment['gate'],
+                        'ETA': eta_str,
+                        'ETD': etd_str,
+                        'Inbound City': assignment['inbound_city'],
+                        'Outbound City': assignment['outbound_city'],
                         'Heaviness': assignment['heaviness'],
-                        'Team': assignment['team_assigned'] if assignment['team_assigned'] else 'UNASSIGNED',
-                        'Status': '✅' if assignment['assignment_success'] else '❌'
+                        'Ramp Team': assignment['team_assigned'] if assignment['team_assigned'] else 'UNASSIGNED',
+                        'Status': '✅ Assigned' if assignment['assignment_success'] else '❌ Unassigned'
                     })
                 
                 flight_df = pd.DataFrame(flight_data)
-                st.dataframe(flight_df, use_container_width=True)
+                st.dataframe(flight_df, use_container_width=True, hide_index=True)
+                
+                # Show team member details for each flight
+                st.divider()
+                st.subheader("Team Details by Flight")
+                
+                for assignment in scheduler.assignments:
+                    if assignment['assignment_success'] and assignment['team_assigned']:
+                        with st.expander(f"Flight {assignment['flight_id']} - Team {assignment['team_assigned']} - {assignment['inbound_city']}→{assignment['outbound_city']}"):
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.write(f"**Gate:** {assignment['gate']}")
+                                st.write(f"**Time:** {assignment['eta'].strftime('%H:%M')} - {assignment['etd'].strftime('%H:%M')}")
+                            with col2:
+                                st.write(f"**Heaviness:** {assignment['heaviness']}")
+                                st.write(f"**Aircraft:** {assignment.get('aircraft', 'N/A')}")
+                            
+                            st.write("**Team Members:**")
+                            for member in assignment['team_members']:
+                                st.write(f"• {flip_name(member)}")
                 
                 if st.button("Export Schedule"):
                     scheduler.export_schedule()
                     st.success("Schedule exported!")
             else:
-                st.info("No flights assigned yet. Click 'Assign Flights' to begin.")
+                st.info("No flights assigned yet. Click 'Assign Flights' in the Dashboard tab to begin.")
+                
+                # Show unassigned flights
+                st.subheader("Unassigned Flights")
+                flights_df = scheduler.flight_handler.flights_df
+                
+                flight_table_data = []
+                for _, flight in flights_df.iterrows():
+                    flight_table_data.append({
+                        'Arrival Flight #': flight['flight_number'],
+                        'Departure Flight #': flight.get('outbound_flight', 'N/A'),
+                        'Gate': flight.get('gate', 'N/A'),
+                        'ETA': flight['eta_datetime'].strftime('%H:%M') if hasattr(flight['eta_datetime'], 'strftime') else str(flight.get('eta', 'N/A')),
+                        'ETD': flight['etd_datetime'].strftime('%H:%M') if hasattr(flight['etd_datetime'], 'strftime') else str(flight.get('etd', 'N/A')),
+                        'Inbound City': flight.get('city', 'N/A'),
+                        'Outbound City': flight.get('outbound_city', 'N/A'),
+                        'Heaviness': flight.get('heaviness', 'Medium')
+                    })
+                
+                flight_table_df = pd.DataFrame(flight_table_data)
+                st.dataframe(flight_table_df, use_container_width=True, hide_index=True)
         
         with tab3:
             st.header("Team Status")
